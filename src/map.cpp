@@ -8,7 +8,7 @@ Map::Map(int step_size, int map_size, int margin)
 {
   start = sf::Vector2i(0, 0);
   end = sf::Vector2i(map_size - 1, map_size - 1);
-  
+
   this->rectangles.reserve(m_map_size * m_map_size);
   this->occupants.reserve(m_map_size * m_map_size);
   for (int i = 0; i < m_map_size; ++i)
@@ -70,7 +70,7 @@ void Map::generate_random_map()
       int map_area = 2;
       if (r == 0 && !((i < map_area && j < map_area) || (i > m_map_size - map_area && j > m_map_size - map_area)))
       {
-        rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Black);
+        rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Yellow);
         occupants.at(i * m_map_size + j) = 0;
       }
     }
@@ -84,7 +84,7 @@ void Map::put_wall(int x, int y)
   if (x + 1 > m_map_size || y + 1 > m_map_size || x < 0 || y < 0)
     return;
   occupants.at(x * m_map_size + y) = 0;
-  rectangles.at(x * m_map_size + y)->setFillColor(sf::Color::Black);
+  rectangles.at(x * m_map_size + y)->setFillColor(sf::Color::Yellow);
 }
 
 // REMOVE ALL WALLS
@@ -96,7 +96,7 @@ void Map::remove_wall(int x, int y)
   if (occupants.at(x * m_map_size + y) == 0)
   {
     occupants.at(x * m_map_size + y) = 1;
-    rectangles.at(x * m_map_size + y)->setFillColor(sf::Color::White);
+    rectangles.at(x * m_map_size + y)->setFillColor(sf::Color::Black);
   }
 }
 
@@ -149,13 +149,13 @@ void Map::init_map()
         rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Red);
         occupants.push_back(4);
       }
-      else // the rest of the map is white
+      else // the rest of the map is black
       {
         rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Black);
         occupants.push_back(1);
       }
 
-      // this is the m_margin, there'll be a thin black line between every cells
+      // this is the m_margin, there'll be a thin white line between every cells
       rectangles.at(i * m_map_size + j)->setPosition(sf::Vector2f(i * m_step_size + m_margin, j * m_step_size + m_margin));
       rectangles.at(i * m_map_size + j)->setOutlineThickness(1.0f);
       rectangles.at(i * m_map_size + j)->setOutlineColor(sf::Color::White);
