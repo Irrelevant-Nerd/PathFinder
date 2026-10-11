@@ -141,14 +141,14 @@ void Map::init_map()
       }
       else // the rest of the map is white
       {
-        rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::White);
+        rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Black);
         occupants.push_back(1);
       }
 
       // this is the m_margin, there'll be a thin black line between every cells
       rectangles.at(i * m_map_size + j)->setPosition(sf::Vector2f(i * m_step_size + m_margin, j * m_step_size + m_margin));
       rectangles.at(i * m_map_size + j)->setOutlineThickness(1.0f);
-      rectangles.at(i * m_map_size + j)->setOutlineColor(sf::Color::Black);
+      rectangles.at(i * m_map_size + j)->setOutlineColor(sf::Color::White);
     }
   }
 }
