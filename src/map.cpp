@@ -8,7 +8,7 @@ Map::Map(int step_size, int map_size, int margin)
 {
   start = sf::Vector2i(0, 0);
   end = sf::Vector2i(map_size - 1, map_size - 1);
-
+  
   this->rectangles.reserve(m_map_size * m_map_size);
   this->occupants.reserve(m_map_size * m_map_size);
   for (int i = 0; i < m_map_size; ++i)
@@ -33,6 +33,7 @@ Map::~Map()
   }
 }
 
+// DRAW WALLS
 void Map::draw(sf::RenderWindow &window)
 {
   for (int i = 0; i < m_map_size; ++i)
@@ -44,6 +45,7 @@ void Map::draw(sf::RenderWindow &window)
   }
 }
 
+// ADD PATH
 void Map::add_path(std::vector <sf::Vector3i> &path)
 {
   for (auto step : path)
@@ -55,6 +57,7 @@ void Map::add_path(std::vector <sf::Vector3i> &path)
   }
 }
 
+// GENERATE MAP RANDOMLY
 void Map::generate_random_map()
 {
   srand(3);
@@ -74,6 +77,7 @@ void Map::generate_random_map()
   }
 }
 
+// PUT A WALL
 void Map::put_wall(int x, int y)
 {
   // if out of bounds, return
@@ -83,6 +87,7 @@ void Map::put_wall(int x, int y)
   rectangles.at(x * m_map_size + y)->setFillColor(sf::Color::Black);
 }
 
+// REMOVE ALL WALLS
 void Map::remove_wall(int x, int y)
 {
   if (x + 1 > m_map_size || y + 1 > m_map_size || x < 0 || y < 0)
@@ -95,11 +100,13 @@ void Map::remove_wall(int x, int y)
   }
 }
 
+// REMOVE WALLS
 void Map::remove_walls()
 {
   init_map();
 }
 
+// CHECK IF THE CELL IS A WALL
 bool Map::is_wall(int x, int y)
 {
   if (x > m_map_size - 1 || y > m_map_size - 1 || y < 0 || x < 0)
@@ -107,6 +114,7 @@ bool Map::is_wall(int x, int y)
   return occupants.at(x * m_map_size + y) == 0;
 }
 
+// SET START CELL RIGHT AFTER INITIALIZING A MAP
 void Map::set_start(int x, int y)
 {
   if (x + 1 > m_map_size || y + 1 > m_map_size || x < 0 || y < 0)
@@ -115,6 +123,7 @@ void Map::set_start(int x, int y)
   init_map();
 }
 
+// SET STOP CELL RIGHT AFTER INITIALIZING A MAP
 void Map::set_end(int x, int y)
 {
   if (x + 1 > m_map_size || y + 1 > m_map_size || x < 0 || y < 0)
@@ -123,6 +132,7 @@ void Map::set_end(int x, int y)
   init_map();
 }
 
+// INITIALIZE MAP AFTER CONSTRUCTING MAP
 void Map::init_map()
 {
   for (int i = 0; i < m_map_size; ++i)
