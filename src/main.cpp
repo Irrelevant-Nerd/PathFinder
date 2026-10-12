@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <map.h>
+#include <path.h>
 
 void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map &map, sf::RenderWindow &window)
 {
@@ -15,8 +16,13 @@ void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map &map, sf::RenderWindow
     map.generate_random_map();
   }
 
+  // start a path
   if (key->code == sf::Keyboard::Key::B)
-  {
+    path.emplace_back(map.get_end().x, map.get_end().y, 0);
+    find_end(path, map);
+    clear_paths(path, map);
+    map.add_path(path);
+    path_done = true;{
   }
 
   // randomly setting a start cell across the map
