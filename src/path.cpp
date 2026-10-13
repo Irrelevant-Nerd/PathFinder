@@ -7,27 +7,27 @@ void Path::clear_paths(std::vector<sf::Vector3i> &path, Map &map)
     sf::Vector3i start;
     for (auto step : path)
     {
-        if (step.x == map.get_start().x && step.y == map.get_start().y)
-        {
-            start = step;
+      if (step.x == map.get_start().x && step.y == map.get_start().y)
+      {
+        start = step;
     }
     }
     temp.push_back(start);
     int i = start.z;
     while (i > 0)
     {
-        //std::cout << path.at(i - 1).x << " " << path.at(i - 1).y << std::endl;
-        temp.push_back(path.at(i - 1));
-        i = path.at(i - 1).z;
+      //std::cout << path.at(i - 1).x << " " << path.at(i - 1).y << std::endl;
+      temp.push_back(path.at(i - 1));
+      i = path.at(i - 1).z;
     }
     path.erase(path.begin(), path.end());
     for (auto step : temp)
     {
-        path.push_back(step);
+      path.push_back(step);
     }
 }
 
-void Path::find_path(std::vector<sf::Vector3i> &path, Map &map)
+void Path::find_end(std::vector<sf::Vector3i> &path, Map &map)
 {
     std::vector<sf::Vector3i> lastStep; // [(x, y, z), (x, y, z),]
     std::vector<sf::Vector2i> usedCoords;
@@ -37,18 +37,18 @@ void Path::find_path(std::vector<sf::Vector3i> &path, Map &map)
     int counter = 0;
     while (counter < 2000)
     {
-        int size = lastStep.size(); // 2
+        int size = lastStep.size();
         for (int i = 0; i < size; ++i)
         {
           auto step = lastStep.at(i);
-          check_coord(map, step.x, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep, path);
-          check_coord(map, step.x + 1, step.y, path.size() - size + 1 + i, usedCoords, lastStep, path);
-          check_coord(map, step.x, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep, path);
-          check_coord(map, step.x - 1, step.y, path.size() - size + 1 + i, usedCoords, lastStep, path);
-          check_coord(map, step.x + 1, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep, path);
-          check_coord(map, step.x + 1, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep, path);
-          check_coord(map, step.x - 1, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep, path);
-          check_coord(map, step.x - 1, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep, path);
+          check_coord(map, step.x, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
+          check_coord(map, step.x + 1, step.y, path.size() - size + 1 + i, usedCoords, lastStep);
+          check_coord(map, step.x, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
+          check_coord(map, step.x - 1, step.y, path.size() - size + 1 + i, usedCoords, lastStep);
+          check_coord(map, step.x + 1, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
+          check_coord(map, step.x + 1, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
+          check_coord(map, step.x - 1, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
+          check_coord(map, step.x - 1, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
         }
 
         lastStep.erase(lastStep.begin(), lastStep.begin() + size);
@@ -67,8 +67,7 @@ void Path::find_path(std::vector<sf::Vector3i> &path, Map &map)
 
 void Path::check_coord(Map &map, int x, int y, int z,
                        std::vector<sf::Vector2i> &use_coords,
-                       std::vector<sf::Vector3i> &last_step,
-                       std::vector<sf::Vector3i> &path)
+                       std::vector<sf::Vector3i> &last_step)
 {
   if (!map.is_wall(x, y) && !is_used_coord(x, y, use_coords))
   {
@@ -79,7 +78,9 @@ void Path::check_coord(Map &map, int x, int y, int z,
 
 bool Path::is_used_coord(int x, int y, std::vector<sf::Vector2i> &coords)
 {
-  for (int i = 0; i < coords.size(); ++i)
+
+  // coords.size() returns long unsigned int, cast it to int to compare
+  for (int i = 0; i < static_cast<int>(coords.size()); ++i)
   {
     if (coords.at(i).x == x && coords.at(i).y == y)
       return true;
@@ -103,8 +104,8 @@ void Path::dijkstras_algorithm(sf::Vector3i &current,
   {
     // Find the node with the lowest distance.
     int minIndex = 0;
-
-    for (int i = 1; i < frontier.size(); ++i)
+    // frontier.size() returns long unsigned int, cast it to int to compare
+    for (int i = 1; i < static_cast<int>(frontier.size()); ++i)
     {
       if (frontier[i].z < frontier[minIndex].z)
         minIndex = i;
