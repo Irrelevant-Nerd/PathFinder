@@ -2,8 +2,9 @@
 #include <iostream>
 #include <map.h>
 #include <path.h>
+#include <vector>
 
-void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map &map, sf::RenderWindow &window)
+void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::RenderWindow& window, std::vector<sf::Vector3i>& path, Path& path_obj)
 {
   // removes all walls
   if(key->code == sf::Keyboard::Key::C)
@@ -18,11 +19,11 @@ void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map &map, sf::RenderWindow
 
   // start a path
   if (key->code == sf::Keyboard::Key::B)
+  {
     path.emplace_back(map.get_end().x, map.get_end().y, 0);
-    find_end(path, map);
-    clear_paths(path, map);
+    path_obj.find_end(path, map);
+    path_obj.clear_paths(path, map);
     map.add_path(path);
-    path_done = true;{
   }
 
   // randomly setting a start cell across the map
@@ -64,7 +65,7 @@ void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map &map, sf::RenderWindow
 // handles the mouse
 void handle_mouse(int MAP_SIZE, int MARGIN, Map &map, sf::RenderWindow &window)
 {
-  // puts a wall on a cell by right clicking
+  // puts a wall on a cell by left clicking
   if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
   {
     int mx = sf::Mouse::getPosition(window).x - MARGIN;
@@ -77,7 +78,7 @@ void handle_mouse(int MAP_SIZE, int MARGIN, Map &map, sf::RenderWindow &window)
     }
   }
 
-  // removes a wall on a cell by left clicking
+  // removes a wall on a cell by right clicking
   else if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
   {
     int mx = sf::Mouse::getPosition(window).x - MARGIN;
@@ -103,7 +104,7 @@ int main()
   sf::RenderWindow window(sf::VideoMode({wWIDTH, wHEIGHT}), "Path Finder");
 
   Map map((1280 - MARGIN * 2) / MAP_SIZE, MAP_SIZE, MARGIN);
-
+  Path path_obj;
   while(window.isOpen())
   {
     while(std::optional event = window.pollEvent())
@@ -116,7 +117,7 @@ int main()
       if (const auto* key = event->getIf<sf::Event::KeyPressed>())
       {
         // key is already a pointer, we dont need to pass it down as an address
-        handle_keys(key, MAP_SIZE, MARGIN, map, window);
+        handle_keys(key, MAP_SIZE, MARGIN, map, window, path_obj.get_path(), path_obj);
       }
 
       handle_mouse(MAP_SIZE, MARGIN, map, window);
