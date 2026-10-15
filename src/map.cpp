@@ -1,5 +1,6 @@
 #include <map.h>
 #include <cstdlib>
+#include <iostream>
 
 Map::Map(int step_size, int map_size, int margin)
 : m_step_size {step_size}
@@ -89,8 +90,14 @@ void Map::put_wall(int x, int y)
   // if out of bounds, return
   if (x + 1 > m_map_size || y + 1 > m_map_size || x < 0 || y < 0)
     return;
-  occupants.at(x * m_map_size + y) = 0;
-  rectangles.at(x * m_map_size + y)->setFillColor(sf::Color::Yellow);
+
+  // the cell that we are replacing should not be a start cell (3) or end cell (4)
+  if(occupants.at(x * m_map_size + y) != 3 && occupants.at(x * m_map_size + y) != 4 )
+  {
+    occupants.at(x * m_map_size + y) = 0;
+    rectangles.at(x * m_map_size + y)->setFillColor(sf::Color::Yellow);
+  }
+  else std::cout << "You cannot put a wall on a start or end cell\n";
 }
 
 // REMOVE ALL WALLS
