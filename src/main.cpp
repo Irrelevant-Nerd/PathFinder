@@ -20,6 +20,10 @@ void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::RenderWindow
   // start a path
   if (key->code == sf::Keyboard::Key::B)
   {
+    // make sure the path is empty before seaching again
+    // but the old path will remain instead of creating one again if the end remains unchanged
+    if(!path.empty()) path.clear();
+
     path.emplace_back(map.get_end().x, map.get_end().y, 0);
     path_obj.find_end(path, map);
     path_obj.clear_paths(path, map);
