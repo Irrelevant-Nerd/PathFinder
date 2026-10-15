@@ -55,12 +55,6 @@ void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::RenderWindow
       map.set_end(x, y);
     }
   }
-
-  if(key->code == sf::Keyboard::Key::R)
-  {
-    map.generate_random_map();
-  }
-
 }
 // handles the mouse
 void handle_mouse(int MAP_SIZE, int MARGIN, Map &map, sf::RenderWindow &window)

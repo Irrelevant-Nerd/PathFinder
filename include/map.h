@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <random>
 
 class Map
 {
@@ -22,6 +23,7 @@ public:
 
   void set_start(int x, int y);
   void set_end(int x, int y);
+  int generate_randomness(int range);
 
   int get_map_size() const { return m_map_size; }
   sf::Vector2i get_start() const { return start; }
@@ -45,6 +47,10 @@ private:
   std::vector<sf::RectangleShape*> rectangles; // this vector is a pointer to sf::RectangleShape data type
 
   std::vector <int> occupants;
+
+  // hardware anthropy seed
+  std::random_device rd;
+
 };
 
 #endif /*MAP*/

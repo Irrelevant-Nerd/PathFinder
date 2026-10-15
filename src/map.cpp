@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <map.h>
+#include <cstdlib>
 
 Map::Map(int step_size, int map_size, int margin)
 : m_step_size {step_size}
@@ -67,12 +67,11 @@ void Map::add_path(std::vector <sf::Vector3i> &path)
 // GENERATE MAP RANDOMLY
 void Map::generate_random_map()
 {
-  srand(3);
   for (int i = 0; i < m_map_size; ++i)
   {
     for (int j = 0; j < m_map_size; ++j)
     {
-      int r = rand() % 4; // generates random number from 0 to 3
+      int r = generate_randomness(4); // generates random number from 0 to 3
       rectangles.at(i * m_map_size + j)->setPosition(sf::Vector2f(i * m_step_size + m_margin, j * m_step_size + m_margin));
       int map_area = 2;
       if (r == 0 && !((i < map_area && j < map_area) || (i > m_map_size - map_area && j > m_map_size - map_area)))
@@ -137,6 +136,14 @@ void Map::set_end(int x, int y)
     return;
   end = sf::Vector2i(x, y);
   init_map();
+}
+
+int Map::generate_randomness(int range)
+{
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> distrib(0, range-1);
+
+  return distrib(gen);
 }
 
 // INITIALIZE MAP AFTER CONSTRUCTING MAP
