@@ -9,8 +9,15 @@ Map::Map(int step_size, int map_size, int margin)
   start = sf::Vector2i(0, 0);
   end = sf::Vector2i(map_size - 1, map_size - 1);
 
+  // resize = only holds the amount of elements stored
+  // reserve = only gives a memory for amount of elements that is gonna be stored
+
+  // rectangles stores pointers, so it must start empty, use reserve here
   this->rectangles.reserve(m_map_size * m_map_size);
-  this->occupants.reserve(m_map_size * m_map_size);
+
+  // resize stores integers, so allocate elements right away
+  this->occupants.resize(m_map_size * m_map_size);
+
   for (int i = 0; i < m_map_size; ++i)
   {
     for (int j = 0; j < m_map_size; ++j)
@@ -142,17 +149,18 @@ void Map::init_map()
       if (i == start.x && j == start.y) // put the starting cell at the 0, 0 coordinate (very start)
       {
         rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Green);
-        occupants.push_back(3);
+        // position = value
+        occupants.at(i * m_map_size + j) = 3;
       }
       else if (i == end.x && j == end.y) // put the ending cell at the MAP_SIZE -1, MAP_SIZE -1 coordinate (very end)
       {
         rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Red);
-        occupants.push_back(4);
+        occupants.at(i * m_map_size + j) = 4;
       }
       else // the rest of the map is black
       {
         rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Black);
-        occupants.push_back(1);
+        occupants.at(i * m_map_size + j) = 1;
       }
 
       // this is the m_margin, there'll be a thin white line between every cells
