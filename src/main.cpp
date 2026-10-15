@@ -89,8 +89,8 @@ void handle_mouse(int MAP_SIZE, int MARGIN, Map &map, sf::RenderWindow &window)
 int main()
 {
   // CONSTANTS
-  constexpr int wWIDTH = 1080;
-  constexpr int wHEIGHT = 1080;
+  constexpr int wWIDTH = 900;
+  constexpr int wHEIGHT = 900;
 
   int MAP_SIZE = 50;
   int MARGIN = 50;
