@@ -109,6 +109,7 @@ int main()
   text.setString("'S' = Start position, 'E' = End position, 'R' = Random map, 'B' = Begin pathing, 'C' = Clear map.");
   text.setFillColor(sf::Color::Black);
   text.setCharacterSize(20);
+  text.setPosition({wHEIGHT - (wHEIGHT - 20), 0});
 
   while(window.isOpen())
   {
