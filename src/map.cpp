@@ -1,6 +1,7 @@
 #include <map.h>
 #include <cstdlib>
 #include <iostream>
+#include <algorithm>
 
 Map::Map(int step_size, int map_size, int margin)
 : m_step_size {step_size}
@@ -68,10 +69,31 @@ void Map::add_path(std::vector <sf::Vector3i> &path)
 // GENERATE MAP RANDOMLY
 void Map::generate_random_map()
 {
+  // if theres an existing wall
+  if(std::find(occupants.begin(), occupants.end(), 0) != occupants.end())
+  {
+    std::cout << "generate map again\n";
+    for (int i = 0; i < m_map_size; ++i)
+    {
+      for (int j = 0; j < m_map_size; ++j)
+      {
+        // skip the start cell and end cell
+        if(occupants.at(i * m_map_size + j) == 3 || occupants.at(i * m_map_size + j) == 4) continue;
+
+        rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Black);
+        occupants.at(i * m_map_size + j) = 1;
+      }
+    }
+  }
+  else std::cout << "generate map for the first time\n";
+
   for (int i = 0; i < m_map_size; ++i)
   {
     for (int j = 0; j < m_map_size; ++j)
     {
+      // skip the start cell and end cell
+      if(occupants.at(i * m_map_size + j) == 3 || occupants.at(i * m_map_size + j) == 4) continue;
+
       int r = generate_randomness(4); // generates random number from 0 to 3
       rectangles.at(i * m_map_size + j)->setPosition(sf::Vector2f(i * m_step_size + m_margin, j * m_step_size + m_margin));
       int map_area = 2;
