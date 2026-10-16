@@ -103,6 +103,13 @@ int main()
 
   Map map((1280 - MARGIN * 2) / MAP_SIZE, MAP_SIZE, MARGIN);
   Path path_obj;
+
+  sf::Font font("assets/fonts/PixelifySans-Regular.ttf");
+  sf::Text text(font);
+  text.setString("'S' = Start position, 'E' = End position, 'R' = Random map, 'B' = Begin pathing, 'C' = Clear map.");
+  text.setFillColor(sf::Color::Black);
+  text.setCharacterSize(20);
+
   while(window.isOpen())
   {
     while(std::optional event = window.pollEvent())
@@ -123,6 +130,7 @@ int main()
 
     window.clear(sf::Color::White);
     map.draw(window);
+    window.draw(text);
     window.display();
   }
 
