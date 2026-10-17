@@ -1,6 +1,11 @@
 #include <path.h>
 #include <iostream>
 
+#include <queue>
+#include <limits>
+#include <algorithm>
+#include <functional>
+
 void Path::clear_paths(std::vector<sf::Vector3i> &path, Map &map)
 {
     std::vector<sf::Vector3i> temp;
@@ -27,32 +32,36 @@ void Path::clear_paths(std::vector<sf::Vector3i> &path, Map &map)
     }
 }
 
+// find the path using breadth-first search (BFS)
 bool Path::find_end(std::vector<sf::Vector3i> &path, Map &map)
 {
-  std::vector<sf::Vector3i> lastStep; // [(x, y, z), (x, y, z),]
-  std::vector<sf::Vector2i> usedCoords;
-  usedCoords.emplace_back(path.at(0).x, path.at(0).y);
-  lastStep.push_back(path.at(0));
+  std::vector<sf::Vector3i> last_step; // [(x, y, z), (x, y, z),]
+
+  const int map_size = map.get_map_size();
+  std::vector<bool> used(map_size * map_size, false);
+  used[path.at(0).x * map_size + path.at(0).y] = true;
+
+  last_step.push_back(path.at(0));
 
   int counter = 0;
   while (counter < 2000)
   {
-    int size = lastStep.size();
+    int size = last_step.size();
     for (int i = 0; i < size; ++i)
     {
-      auto step = lastStep.at(i);
-      check_coord(map, step.x, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
-      check_coord(map, step.x + 1, step.y, path.size() - size + 1 + i, usedCoords, lastStep);
-      check_coord(map, step.x, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
-      check_coord(map, step.x - 1, step.y, path.size() - size + 1 + i, usedCoords, lastStep);
-      check_coord(map, step.x + 1, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
-      check_coord(map, step.x + 1, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
-      check_coord(map, step.x - 1, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
-      check_coord(map, step.x - 1, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
+      auto step = last_step.at(i);
+      check_coord(map, step.x, step.y - 1, path.size() - size + 1 + i, used, last_step);
+      check_coord(map, step.x + 1, step.y, path.size() - size + 1 + i, used, last_step);
+      check_coord(map, step.x, step.y + 1, path.size() - size + 1 + i, used, last_step);
+      check_coord(map, step.x - 1, step.y, path.size() - size + 1 + i, used, last_step);
+      check_coord(map, step.x + 1, step.y - 1, path.size() - size + 1 + i, used, last_step);
+      check_coord(map, step.x + 1, step.y + 1, path.size() - size + 1 + i, used, last_step);
+      check_coord(map, step.x - 1, step.y + 1, path.size() - size + 1 + i, used, last_step);
+      check_coord(map, step.x - 1, step.y - 1, path.size() - size + 1 + i, used, last_step);
     }
 
-    lastStep.erase(lastStep.begin(), lastStep.begin() + size);
-    for (auto step : lastStep)
+    last_step.erase(last_step.begin(), last_step.begin() + size);
+    for (auto step : last_step)
     {
       path.push_back(step);
       if (step.x == map.get_start().x && step.y == map.get_start().y) return true;
@@ -65,14 +74,20 @@ bool Path::find_end(std::vector<sf::Vector3i> &path, Map &map)
 }
 
 void Path::check_coord(Map &map, int x, int y, int z,
-                       std::vector<sf::Vector2i> &use_coords,
+                       std::vector<bool> &used,
                        std::vector<sf::Vector3i> &last_step)
 {
-  if (!map.is_wall(x, y) && !is_used_coord(x, y, use_coords))
-  {
-    last_step.emplace_back(x, y, z);
-    use_coords.emplace_back(x, y);
-  }
+  // also catches out of bounds, so check it first
+  if (map.is_wall(x, y))
+    return;
+
+  // turns a cell x and y position into a single number to used as an index
+  int index = x * map.get_map_size() + y;
+  if (used[index]) // used the index to look whether the cell was already visited
+    return;        // true - already visited, false - not visited yet
+
+  used[index] = true;
+  last_step.emplace_back(x, y, z); // adds a new entry to the end of last_step
 }
 
 bool Path::is_used_coord(int x, int y, std::vector<sf::Vector2i> &coords)
@@ -87,62 +102,77 @@ bool Path::is_used_coord(int x, int y, std::vector<sf::Vector2i> &coords)
   return false;
 }
 
-// finds the shortest path
-void Path::dijkstras_algorithm(sf::Vector3i &current,
-                               std::vector<bool> &visited,
-                               std::vector<sf::Vector3i> &path,
-                               Map &map)
+// finds the path using dijkstras_algorithm
+bool Path::dijkstras_algorithm(std::vector<sf::Vector3i> &path, Map &map)
 {
-  std::vector<sf::Vector3i> temp;
-  std::vector<sf::Vector3i> frontier;
+  path.clear();
 
-  current.z = 0;
-  frontier.push_back(current);
+  const int size = map.get_map_size();
+  const int INF = std::numeric_limits<int>::max();
 
-  while (!frontier.empty())
+  std::vector<int> dist(size * size, INF); // cheapest known cost to each cell
+  std::vector<int> parent(size * size, -1); // which cell we came from
+
+  // (cost, cell index). greater<> makes the cheapest come out first
+  using Item = std::pair<int, int>;
+  std::priority_queue<Item, std::vector<Item>, std::greater<Item>> queue;
+
+  int startIndex = map.get_start().x * size + map.get_start().y;
+  int endIndex = map.get_end().x * size + map.get_end().y;
+
+  dist[startIndex] = 0;
+  queue.push({0, startIndex});
+
+  // dx, dy, cost (straight = 10, diagonal = 14)
+  const int moves[8][3] = {{0, -1, 10}, {1, 0, 10}, {0, 1, 10}, {-1, 0, 10},
+                           {1, -1, 14}, {1, 1, 14}, {-1, 1, 14}, {-1, -1, 14}};
+
+  while (!queue.empty())
   {
-    // Find the node with the lowest distance.
-    int minIndex = 0;
-    // frontier.size() returns long unsigned int, cast it to int to compare
-    for (int i = 1; i < static_cast<int>(frontier.size()); ++i)
-    {
-      if (frontier[i].z < frontier[minIndex].z)
-        minIndex = i;
-    }
+    auto [cost, index] = queue.top();
+    queue.pop();
 
-    current = frontier[minIndex];
-    frontier.erase(frontier.begin() + minIndex);
-
-    int index = current.y * map.get_map_size() + current.x;
-
-    if (visited[index])
+    if (cost > dist[index]) // old entry, a cheaper one was already found
       continue;
+    if (index == endIndex)
+      break;
 
-    visited[index] = true;
+    int x = index / size;
+    int y = index % size;
 
-    // Stop when the goal is reached.
-    if (current.x == path[0].x &&
-      current.y == path[0].y)
+    for (auto &m : moves)
     {
-      path.push_back(current);
-      return;
-    }
+      int nx = x + m[0];
+      int ny = y + m[1];
 
-    find_neighbors(current, temp, map);
+      if (map.is_wall(nx, ny)) // is_wall also covers out of bounds
+        continue;
 
-    for (auto neighbor : temp)
-    {
-      int neighborIndex =
-          neighbor.y * map.get_map_size() + neighbor.x;
+      // no cutting corners: a diagonal needs both side cells open
+      if (m[2] == 14 && (map.is_wall(nx, y) || map.is_wall(x, ny)))
+        continue;
 
-      if (visited[neighborIndex])
-          continue;
+      int nIndex = nx * size + ny;
+      int newCost = cost + m[2];
 
-      neighbor.z = current.z + 1;
-
-      frontier.push_back(neighbor);
+      if (newCost < dist[nIndex])
+      {
+        dist[nIndex] = newCost;
+        parent[nIndex] = index;
+        queue.push({newCost, nIndex});
+      }
     }
   }
+
+  if (dist[endIndex] == INF) // never reached the end
+    return false;
+
+  // walk back from the end to the start, then flip it
+  for (int i = endIndex; i != -1; i = parent[i])
+    path.emplace_back(i / size, i % size, 0);
+  std::reverse(path.begin(), path.end());
+
+  return true;
 }
 
 void Path::find_neighbors(sf::Vector3i current,

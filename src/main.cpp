@@ -3,8 +3,9 @@
 #include <map.h>
 #include <path.h>
 #include <vector>
+#include <chrono>
 
-void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::RenderWindow& window, std::vector<sf::Vector3i>& path, Path& path_obj)
+void handle_keys(const auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::RenderWindow& window, std::vector<sf::Vector3i>& path, Path& path_obj)
 {
   // removes all walls
   if(key->code == sf::Keyboard::Key::C)
@@ -15,6 +16,38 @@ void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::RenderWindow
   if(key->code == sf::Keyboard::Key::R)
   {
     map.generate_random_map();
+  }
+
+  if (key->code == sf::Keyboard::Key::T)
+  {
+    const int runs = 100;
+    std::vector<sf::Vector3i> p;
+
+    auto t0 = std::chrono::steady_clock::now();
+    for (int r = 0; r < runs; ++r)
+    {
+      p.clear();
+      p.emplace_back(map.get_end().x, map.get_end().y, 0);
+      path_obj.find_end(p, map);
+      path_obj.clear_paths(p, map);
+    }
+    auto t1 = std::chrono::steady_clock::now();
+
+    for (int r = 0; r < runs; ++r)
+      path_obj.dijkstras_algorithm(p, map);
+    auto t2 = std::chrono::steady_clock::now();
+
+    using us = std::chrono::duration<double, std::micro>;
+    std::cout << "BFS:      " << us(t1 - t0).count() / runs << " us\n";
+    std::cout << "Dijkstra: " << us(t2 - t1).count() / runs << " us\n";
+  }
+
+  if (key->code == sf::Keyboard::Key::D)
+  {
+    if (path_obj.dijkstras_algorithm(path, map))
+      map.add_path(path);
+    else
+      std::cout << "No path found" << std::endl;
   }
 
   // start a path
