@@ -133,7 +133,6 @@ void handle_mouse(int MAP_SIZE, int MARGIN, Map &map, sf::RenderWindow &window)
 
 int main()
 {
-  // CONSTANTS
   constexpr int wWIDTH = 900;
   constexpr int wHEIGHT = 900;
 

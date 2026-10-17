@@ -42,7 +42,7 @@ Map::~Map()
   }
 }
 
-// DRAW WALLS
+// draw walls
 void Map::draw(sf::RenderWindow &window)
 {
   for (int i = 0; i < m_map_size; ++i)
@@ -54,7 +54,7 @@ void Map::draw(sf::RenderWindow &window)
   }
 }
 
-// ADD PATH
+// add path
 void Map::add_path(std::vector <sf::Vector3i> &path)
 {
   for (auto step : path)
@@ -66,7 +66,7 @@ void Map::add_path(std::vector <sf::Vector3i> &path)
   }
 }
 
-// GENERATE MAP RANDOMLY
+// generate map randomly
 void Map::generate_random_map()
 {
   // if theres an existing wall
@@ -106,7 +106,7 @@ void Map::generate_random_map()
   }
 }
 
-// PUT A WALL
+// put a wall on a specific cell
 void Map::put_wall(int x, int y)
 {
   // if out of bounds, return
@@ -122,7 +122,7 @@ void Map::put_wall(int x, int y)
   else std::cout << "You cannot put a wall on a start or end cell\n";
 }
 
-// REMOVE ALL WALLS
+// remove a wall on a specific cell
 void Map::remove_wall(int x, int y)
 {
   if (x + 1 > m_map_size || y + 1 > m_map_size || x < 0 || y < 0)
@@ -135,13 +135,13 @@ void Map::remove_wall(int x, int y)
   }
 }
 
-// REMOVE WALLS
+// remove walls from all cells
 void Map::remove_walls()
 {
   init_map();
 }
 
-// CHECK IF THE CELL IS A WALL
+// check if the cell is a wall
 bool Map::is_wall(int x, int y)
 {
   if (x > m_map_size - 1 || y > m_map_size - 1 || y < 0 || x < 0)
@@ -149,7 +149,7 @@ bool Map::is_wall(int x, int y)
   return occupants.at(x * m_map_size + y) == 0;
 }
 
-// SET START CELL RIGHT AFTER INITIALIZING A MAP
+// set start cell after initializing map
 void Map::set_start(int x, int y)
 {
   if (x + 1 > m_map_size || y + 1 > m_map_size || x < 0 || y < 0)
@@ -158,7 +158,7 @@ void Map::set_start(int x, int y)
   init_map();
 }
 
-// SET END CELL RIGHT AFTER INITIALIZING A MAP
+// set end cell after initializing map
 void Map::set_end(int x, int y)
 {
   if (x + 1 > m_map_size || y + 1 > m_map_size || x < 0 || y < 0)
@@ -188,18 +188,20 @@ void Map::init_map()
         // position = value
         occupants.at(i * m_map_size + j) = 3;
       }
-      else if (i == end.x && j == end.y) // put the ending cell at the MAP_SIZE -1, MAP_SIZE -1 coordinate (very end)
+
+      else if (i == end.x && j == end.y) // put the ending cell at the MAP_SIZE-1, MAP_SIZE-1 coordinate (very end)
       {
         rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Red);
         occupants.at(i * m_map_size + j) = 4;
       }
+
       else // the rest of the map is black
       {
         rectangles.at(i * m_map_size + j)->setFillColor(sf::Color::Black);
         occupants.at(i * m_map_size + j) = 1;
       }
 
-      // this is the m_margin, there'll be a thin white line between every cells
+      // margin, there'll be a thin white line between every cells
       rectangles.at(i * m_map_size + j)->setPosition(sf::Vector2f(i * m_step_size + m_margin, j * m_step_size + m_margin));
       rectangles.at(i * m_map_size + j)->setOutlineThickness(1.0f);
       rectangles.at(i * m_map_size + j)->setOutlineColor(sf::Color::White);

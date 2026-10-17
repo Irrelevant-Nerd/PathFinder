@@ -6,31 +6,6 @@
 #include <algorithm>
 #include <functional>
 
-void Path::clear_paths(std::vector<sf::Vector3i> &path, Map &map)
-{
-    std::vector<sf::Vector3i> temp;
-    sf::Vector3i start;
-    for (auto step : path)
-    {
-      if (step.x == map.get_start().x && step.y == map.get_start().y)
-      {
-        start = step;
-    }
-    }
-    temp.push_back(start);
-    int i = start.z;
-    while (i > 0)
-    {
-      //std::cout << path.at(i - 1).x << " " << path.at(i - 1).y << std::endl;
-      temp.push_back(path.at(i - 1));
-      i = path.at(i - 1).z;
-    }
-    path.erase(path.begin(), path.end());
-    for (auto step : temp)
-    {
-      path.push_back(step);
-    }
-}
 
 // find the path using breadth-first search (BFS)
 bool Path::breadth_first_search(std::vector<sf::Vector3i> &path, Map &map)
@@ -80,37 +55,34 @@ bool Path::breadth_first_search(std::vector<sf::Vector3i> &path, Map &map)
     ++counter;
   }
 
-  // return false if no end found
+  // return false if no end cell found
   return false;
 }
 
-void Path::check_coord(Map &map, int x, int y, int z,
-                       std::vector<bool> &used,
-                       std::vector<sf::Vector3i> &last_step)
+// turns visited cells to an actual route (not necessarily clearing paths as the name suggests)
+void Path::clear_paths(std::vector<sf::Vector3i> &path, Map &map)
 {
-  // also catches out of bounds, so check it first
-  if (map.is_wall(x, y))
-    return;
-
-  // turns a cell x and y position into a single number to used as an index
-  int index = x * map.get_map_size() + y;
-  if (used[index]) // used the index to look whether the cell was already visited
-    return;        // true - already visited, false - not visited yet
-
-  used[index] = true;
-  last_step.emplace_back(x, y, z); // adds a new entry to the end of last_step
-}
-
-bool Path::is_used_coord(int x, int y, std::vector<sf::Vector2i> &coords)
-{
-
-  // coords.size() returns long unsigned int, cast it to int to compare
-  for (int i = 0; i < static_cast<int>(coords.size()); ++i)
-  {
-    if (coords.at(i).x == x && coords.at(i).y == y)
-      return true;
-  }
-  return false;
+    std::vector<sf::Vector3i> temp;
+    sf::Vector3i start;
+    for (auto step : path)
+    {
+      if (step.x == map.get_start().x && step.y == map.get_start().y)
+      {
+        start = step;
+    }
+    }
+    temp.push_back(start);
+    int i = start.z;
+    while (i > 0)
+    {
+      temp.push_back(path.at(i - 1));
+      i = path.at(i - 1).z;
+    }
+    path.erase(path.begin(), path.end());
+    for (auto step : temp)
+    {
+      path.push_back(step);
+    }
 }
 
 // finds the path using dijkstras_algorithm
@@ -184,6 +156,36 @@ bool Path::dijkstras_algorithm(std::vector<sf::Vector3i> &path, Map &map)
   std::reverse(path.begin(), path.end());
 
   return true;
+}
+
+// looks for one neighbor cell to decide whether it should be explored next by search
+void Path::check_coord(Map &map, int x, int y, int z,
+                       std::vector<bool> &used,
+                       std::vector<sf::Vector3i> &last_step)
+{
+  // also catches out of bounds, so check it first
+  if (map.is_wall(x, y))
+    return;
+
+  // turns a cell x and y position into a single number to used as an index
+  int index = x * map.get_map_size() + y;
+  if (used[index]) // used the index to look whether the cell was already visited
+    return;        // true - already visited, false - not visited yet
+
+  used[index] = true;
+  last_step.emplace_back(x, y, z); // adds a new entry to the end of last_step
+}
+
+bool Path::is_used_coord(int x, int y, std::vector<sf::Vector2i> &coords)
+{
+
+  // coords.size() returns long unsigned int, cast it to int to compare
+  for (int i = 0; i < static_cast<int>(coords.size()); ++i)
+  {
+    if (coords.at(i).x == x && coords.at(i).y == y)
+      return true;
+  }
+  return false;
 }
 
 void Path::find_neighbors(sf::Vector3i current,
