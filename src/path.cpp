@@ -33,7 +33,7 @@ void Path::clear_paths(std::vector<sf::Vector3i> &path, Map &map)
 }
 
 // find the path using breadth-first search (BFS)
-bool Path::find_end(std::vector<sf::Vector3i> &path, Map &map)
+bool Path::breadth_first_search(std::vector<sf::Vector3i> &path, Map &map)
 {
   std::vector<sf::Vector3i> last_step; // [(x, y, z), (x, y, z),]
 

@@ -18,17 +18,19 @@ void handle_keys(const auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::Render
     map.generate_random_map();
   }
 
+  // track time to know which algorithm is faster BFS or Dijkstras algorithm
   if (key->code == sf::Keyboard::Key::T)
   {
     const int runs = 100;
     std::vector<sf::Vector3i> p;
 
     auto t0 = std::chrono::steady_clock::now();
+
     for (int r = 0; r < runs; ++r)
     {
       p.clear();
       p.emplace_back(map.get_end().x, map.get_end().y, 0);
-      path_obj.find_end(p, map);
+      path_obj.breadth_first_search(p, map);
       path_obj.clear_paths(p, map);
     }
     auto t1 = std::chrono::steady_clock::now();
@@ -44,10 +46,8 @@ void handle_keys(const auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::Render
 
   if (key->code == sf::Keyboard::Key::D)
   {
-    if (path_obj.dijkstras_algorithm(path, map))
-      map.add_path(path);
-    else
-      std::cout << "No path found" << std::endl;
+    if (path_obj.dijkstras_algorithm(path, map)) map.add_path(path);
+    else std::cout << "No path found" << std::endl;
   }
 
   // start a path
@@ -59,7 +59,7 @@ void handle_keys(const auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::Render
 
     path.emplace_back(map.get_end().x, map.get_end().y, 0);
 
-    if(path_obj.find_end(path, map))
+    if(path_obj.breadth_first_search(path, map))
     {
       path_obj.clear_paths(path, map);
       map.add_path(path);
