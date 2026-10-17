@@ -49,15 +49,26 @@ bool Path::breadth_first_search(std::vector<sf::Vector3i> &path, Map &map)
     int size = last_step.size();
     for (int i = 0; i < size; ++i)
     {
+      // make this follow the no-corner-cutting rule like dijkstras algorithm
+
       auto step = last_step.at(i);
-      check_coord(map, step.x, step.y - 1, path.size() - size + 1 + i, used, last_step);
-      check_coord(map, step.x + 1, step.y, path.size() - size + 1 + i, used, last_step);
-      check_coord(map, step.x, step.y + 1, path.size() - size + 1 + i, used, last_step);
-      check_coord(map, step.x - 1, step.y, path.size() - size + 1 + i, used, last_step);
-      check_coord(map, step.x + 1, step.y - 1, path.size() - size + 1 + i, used, last_step);
-      check_coord(map, step.x + 1, step.y + 1, path.size() - size + 1 + i, used, last_step);
-      check_coord(map, step.x - 1, step.y + 1, path.size() - size + 1 + i, used, last_step);
-      check_coord(map, step.x - 1, step.y - 1, path.size() - size + 1 + i, used, last_step);
+      int z = path.size() - size + 1 + i;
+
+      // straight moves stay as they are
+      check_coord(map, step.x,     step.y - 1, z, used, last_step);
+      check_coord(map, step.x + 1, step.y,     z, used, last_step);
+      check_coord(map, step.x,     step.y + 1, z, used, last_step);
+      check_coord(map, step.x - 1, step.y,     z, used, last_step);
+
+      // diagonals only if both side cells are open
+      if (!map.is_wall(step.x + 1, step.y) && !map.is_wall(step.x, step.y - 1))
+        check_coord(map, step.x + 1, step.y - 1, z, used, last_step);
+      if (!map.is_wall(step.x + 1, step.y) && !map.is_wall(step.x, step.y + 1))
+        check_coord(map, step.x + 1, step.y + 1, z, used, last_step);
+      if (!map.is_wall(step.x - 1, step.y) && !map.is_wall(step.x, step.y + 1))
+        check_coord(map, step.x - 1, step.y + 1, z, used, last_step);
+      if (!map.is_wall(step.x - 1, step.y) && !map.is_wall(step.x, step.y - 1))
+        check_coord(map, step.x - 1, step.y - 1, z, used, last_step);
     }
 
     last_step.erase(last_step.begin(), last_step.begin() + size);
