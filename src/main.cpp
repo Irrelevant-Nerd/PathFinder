@@ -5,6 +5,16 @@
 #include <vector>
 #include <chrono>
 
+struct Timer
+{
+  std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  double elapsed_ms() const
+  {
+    return std::chrono::duration<double, std::milli>(
+        std::chrono::steady_clock::now() - start).count();
+  }
+};
+
 void handle_keys(const auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::RenderWindow& window, std::vector<sf::Vector3i>& path, Path& path_obj)
 {
   // removes all walls
@@ -18,38 +28,16 @@ void handle_keys(const auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::Render
     map.generate_random_map();
   }
 
-  // track time to know which algorithm is faster BFS or Dijkstras algorithm
-  if (key->code == sf::Keyboard::Key::T)
-  {
-    const int runs = 100;
-    std::vector<sf::Vector3i> p;
-
-    auto t0 = std::chrono::steady_clock::now();
-
-    for (int r = 0; r < runs; ++r)
-    {
-      p.clear();
-      p.emplace_back(map.get_end().x, map.get_end().y, 0);
-      path_obj.breadth_first_search(p, map);
-      path_obj.clear_paths(p, map);
-    }
-    auto t1 = std::chrono::steady_clock::now();
-
-    for (int r = 0; r < runs; ++r)
-      path_obj.dijkstras_algorithm(p, map);
-    auto t2 = std::chrono::steady_clock::now();
-
-    using us = std::chrono::duration<double, std::micro>;
-    std::cout << "BFS:      " << us(t1 - t0).count() / runs << " us\n";
-    std::cout << "Dijkstra: " << us(t2 - t1).count() / runs << " us\n";
-  }
-
   if (key->code == sf::Keyboard::Key::D)
   {
-    if (path_obj.dijkstras_algorithm(path, map))
+    Timer timer;
+    bool found = path_obj.dijkstras_algorithm(path, map);
+    double ms = timer.elapsed_ms();
+
+    if (found)
     {
       map.add_path(path);
-      std::cout << "Dijkstras algorithm has found a path. Finished\n";
+      std::cout << "Dijkstras algorithm has found a path. Finished in " << ms << " ms\n";
     }
     else
     {
@@ -61,17 +49,20 @@ void handle_keys(const auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::Render
   // start a path
   if (key->code == sf::Keyboard::Key::B)
   {
-    // make sure the path is empty before seaching again
-    // but the old path will remain instead of creating one again if the end remains unchanged
-    if(!path.empty()) path.clear();
-
+    // make sure the path is emptied before seaching again
+    // but the old path remains instead of creating one again if the end cell remains unchanged
+    if (!path.empty()) path.clear();
     path.emplace_back(map.get_end().x, map.get_end().y, 0);
 
-    if(path_obj.breadth_first_search(path, map))
+    Timer timer;
+    bool found = path_obj.breadth_first_search(path, map);
+    double ms = timer.elapsed_ms();
+
+    if(found)
     {
       path_obj.clear_paths(path, map);
       map.add_path(path);
-      std::cout << "Breadth-first search has found a path. Finished\n";
+      std::cout << "Breadth-first search has found a path. Finished in " << ms << " ms\n";
     }
     else
     {
