@@ -146,7 +146,7 @@ int main()
 
   sf::Font font("assets/fonts/HomeVideo-BLG6G.ttf");
   sf::Text text(font);
-  text.setString("'S' = Start position, 'E' = End position, 'R' = Random map, 'B' = BFS, 'D' = dijkstras_algorithm, 'C' = Clear map.");
+  text.setString("'S' = Start position, 'E' = End position, 'R' = Random map, 'B' = BFS, 'D' = Dijkstras algorithm, 'C' = Clear map.");
   text.setFillColor(sf::Color::Black);
   text.setCharacterSize(13);
   text.setPosition({0, wHEIGHT - (wHEIGHT - 20)});
