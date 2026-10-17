@@ -146,12 +146,12 @@ int main()
   Map map((1280 - MARGIN * 2) / MAP_SIZE, MAP_SIZE, MARGIN);
   Path path_obj;
 
-  sf::Font font("assets/fonts/PixelifySans-Regular.ttf");
+  sf::Font font("assets/fonts/HomeVideo-BLG6G.ttf");
   sf::Text text(font);
-  text.setString("'S' = Start position, 'E' = End position, 'R' = Random map, 'B' = Begin pathing, 'C' = Clear map.");
+  text.setString("'S' = Start position, 'E' = End position, 'R' = Random map, 'B' = BFS, 'D' = dijkstras_algorithm, 'C' = Clear map.");
   text.setFillColor(sf::Color::Black);
-  text.setCharacterSize(20);
-  text.setPosition({wHEIGHT - (wHEIGHT - 20), 0});
+  text.setCharacterSize(13);
+  text.setPosition({0, wHEIGHT - (wHEIGHT - 20)});
 
   while(window.isOpen())
   {
