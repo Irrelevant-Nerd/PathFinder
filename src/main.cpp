@@ -25,9 +25,18 @@ void handle_keys(auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::RenderWindow
     if(!path.empty()) path.clear();
 
     path.emplace_back(map.get_end().x, map.get_end().y, 0);
-    path_obj.find_end(path, map);
-    path_obj.clear_paths(path, map);
-    map.add_path(path);
+
+    if(path_obj.find_end(path, map))
+    {
+      path_obj.clear_paths(path, map);
+      map.add_path(path);
+      std::cout << "Path has found. Finished\n";
+    }
+    else
+    {
+      std::cout << "No path has found\n";
+      path.clear();
+    }
   }
 
   // randomly setting a start cell across the map

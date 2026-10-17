@@ -158,7 +158,7 @@ void Map::set_start(int x, int y)
   init_map();
 }
 
-// SET STOP CELL RIGHT AFTER INITIALIZING A MAP
+// SET END CELL RIGHT AFTER INITIALIZING A MAP
 void Map::set_end(int x, int y)
 {
   if (x + 1 > m_map_size || y + 1 > m_map_size || x < 0 || y < 0)

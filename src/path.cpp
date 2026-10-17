@@ -27,42 +27,41 @@ void Path::clear_paths(std::vector<sf::Vector3i> &path, Map &map)
     }
 }
 
-void Path::find_end(std::vector<sf::Vector3i> &path, Map &map)
+bool Path::find_end(std::vector<sf::Vector3i> &path, Map &map)
 {
-    std::vector<sf::Vector3i> lastStep; // [(x, y, z), (x, y, z),]
-    std::vector<sf::Vector2i> usedCoords;
-    usedCoords.emplace_back(path.at(0).x, path.at(0).y);
-    lastStep.push_back(path.at(0));
+  std::vector<sf::Vector3i> lastStep; // [(x, y, z), (x, y, z),]
+  std::vector<sf::Vector2i> usedCoords;
+  usedCoords.emplace_back(path.at(0).x, path.at(0).y);
+  lastStep.push_back(path.at(0));
 
-    int counter = 0;
-    while (counter < 2000)
+  int counter = 0;
+  while (counter < 2000)
+  {
+    int size = lastStep.size();
+    for (int i = 0; i < size; ++i)
     {
-        int size = lastStep.size();
-        for (int i = 0; i < size; ++i)
-        {
-          auto step = lastStep.at(i);
-          check_coord(map, step.x, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
-          check_coord(map, step.x + 1, step.y, path.size() - size + 1 + i, usedCoords, lastStep);
-          check_coord(map, step.x, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
-          check_coord(map, step.x - 1, step.y, path.size() - size + 1 + i, usedCoords, lastStep);
-          check_coord(map, step.x + 1, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
-          check_coord(map, step.x + 1, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
-          check_coord(map, step.x - 1, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
-          check_coord(map, step.x - 1, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
-        }
-
-        lastStep.erase(lastStep.begin(), lastStep.begin() + size);
-        for (auto step : lastStep)
-        {
-          path.push_back(step);
-          if (step.x == map.get_start().x && step.y == map.get_start().y)
-          {
-              std::cout << "Finished" << std::endl;
-              return;
-          }
-        }
-        ++counter;
+      auto step = lastStep.at(i);
+      check_coord(map, step.x, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
+      check_coord(map, step.x + 1, step.y, path.size() - size + 1 + i, usedCoords, lastStep);
+      check_coord(map, step.x, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
+      check_coord(map, step.x - 1, step.y, path.size() - size + 1 + i, usedCoords, lastStep);
+      check_coord(map, step.x + 1, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
+      check_coord(map, step.x + 1, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
+      check_coord(map, step.x - 1, step.y + 1, path.size() - size + 1 + i, usedCoords, lastStep);
+      check_coord(map, step.x - 1, step.y - 1, path.size() - size + 1 + i, usedCoords, lastStep);
     }
+
+    lastStep.erase(lastStep.begin(), lastStep.begin() + size);
+    for (auto step : lastStep)
+    {
+      path.push_back(step);
+      if (step.x == map.get_start().x && step.y == map.get_start().y) return true;
+    }
+    ++counter;
+  }
+
+  // return false if no end found
+  return false;
 }
 
 void Path::check_coord(Map &map, int x, int y, int z,

@@ -9,7 +9,7 @@ class Path
 public:
   void clear_paths(std::vector<sf::Vector3i> &path, Map &map);
 
-  void find_end(std::vector<sf::Vector3i> &path, Map &map);
+  bool find_end(std::vector<sf::Vector3i> &path, Map &map);
 
   void check_coord(Map &map, int x, int y, int z,
                    std::vector<sf::Vector2i> &use_coords,
