@@ -174,7 +174,6 @@ int main()
     window.draw(text);
     window.display();
   }
-
   return 0;
 }
 

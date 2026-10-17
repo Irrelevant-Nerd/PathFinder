@@ -85,6 +85,24 @@ void Path::clear_paths(std::vector<sf::Vector3i> &path, Map &map)
     }
 }
 
+// looks for one neighbor cell to decide whether it should be explored next by the search
+void Path::check_coord(Map &map, int x, int y, int z,
+                       std::vector<bool> &used,
+                       std::vector<sf::Vector3i> &last_step)
+{
+  // also catches out of bounds, so check it first
+  if (map.is_wall(x, y))
+    return;
+
+  // turns a cell x and y position into a single number to used as an index
+  int index = x * map.get_map_size() + y;
+  if (used[index]) // used the index to look whether the cell was already visited
+    return;        // true - already visited, false - not visited yet
+
+  used[index] = true;
+  last_step.emplace_back(x, y, z); // adds a new entry to the end of last_step
+}
+
 // finds the path using dijkstras_algorithm
 bool Path::dijkstras_algorithm(std::vector<sf::Vector3i> &path, Map &map)
 {
@@ -156,49 +174,4 @@ bool Path::dijkstras_algorithm(std::vector<sf::Vector3i> &path, Map &map)
   std::reverse(path.begin(), path.end());
 
   return true;
-}
-
-// looks for one neighbor cell to decide whether it should be explored next by search
-void Path::check_coord(Map &map, int x, int y, int z,
-                       std::vector<bool> &used,
-                       std::vector<sf::Vector3i> &last_step)
-{
-  // also catches out of bounds, so check it first
-  if (map.is_wall(x, y))
-    return;
-
-  // turns a cell x and y position into a single number to used as an index
-  int index = x * map.get_map_size() + y;
-  if (used[index]) // used the index to look whether the cell was already visited
-    return;        // true - already visited, false - not visited yet
-
-  used[index] = true;
-  last_step.emplace_back(x, y, z); // adds a new entry to the end of last_step
-}
-
-bool Path::is_used_coord(int x, int y, std::vector<sf::Vector2i> &coords)
-{
-
-  // coords.size() returns long unsigned int, cast it to int to compare
-  for (int i = 0; i < static_cast<int>(coords.size()); ++i)
-  {
-    if (coords.at(i).x == x && coords.at(i).y == y)
-      return true;
-  }
-  return false;
-}
-
-void Path::find_neighbors(sf::Vector3i current,
-                          std::vector<sf::Vector3i> &temp,
-                          Map &map)
-{
-  temp.erase(temp.begin(), temp.end());
-  if (!map.is_wall(current.x, current.y - 1))
-    temp.emplace_back(current.x, current.y - 1, 1);
-  if (!map.is_wall(current.x + 1, current.y))
-    temp.emplace_back(current.x + 1, current.y, 1);
-  if (!map.is_wall(current.x, current.y + 1))
-    temp.emplace_back(current.x, current.y + 1, 1);
-  if (!map.is_wall(current.x - 1, current.y))
-    temp.emplace_back(current.x - 1, current.y, 1);
 }

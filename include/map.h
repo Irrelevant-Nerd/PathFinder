@@ -29,11 +29,9 @@ public:
   sf::Vector2i get_start() const { return start; }
   sf::Vector2i get_end() const { return end; }
 
-// private methods goes here
 private:
   void init_map();
 
-// private attributes goes here
 private:
   int m_step_size {};
   int m_map_size {};
@@ -50,7 +48,6 @@ private:
 
   // hardware anthropy seed
   std::random_device rd;
-
 };
 
 #endif /*MAP*/
