@@ -46,8 +46,16 @@ void handle_keys(const auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::Render
 
   if (key->code == sf::Keyboard::Key::D)
   {
-    if (path_obj.dijkstras_algorithm(path, map)) map.add_path(path);
-    else std::cout << "No path found" << std::endl;
+    if (path_obj.dijkstras_algorithm(path, map))
+    {
+      map.add_path(path);
+      std::cout << "Dijkstras algorithm has found a path. Finished\n";
+    }
+    else
+    {
+      std::cout << "No path has found. Press 'R' to generate map again\n";
+      path.clear();
+    }
   }
 
   // start a path
@@ -63,11 +71,11 @@ void handle_keys(const auto* key, int MAP_SIZE, int MARGIN, Map& map, sf::Render
     {
       path_obj.clear_paths(path, map);
       map.add_path(path);
-      std::cout << "Path has found. Finished\n";
+      std::cout << "Breadth-first search has found a path. Finished\n";
     }
     else
     {
-      std::cout << "No path has found\n";
+      std::cout << "No path has found. Press 'R' to generate map again\n";
       path.clear();
     }
   }
